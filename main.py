@@ -9,11 +9,15 @@ current_receipt_text = None
 
 @app.get("/chat")
 def chat(prompt: str):
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt
-    )
-    return {"answer": response.text}
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt
+        )
+        return {"answer": response.text}
+
+    except Exception as x:
+        return {"error": str(x)}
 
 
 @app.post("/analyze_bill")

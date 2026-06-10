@@ -29,7 +29,7 @@ async def analyze_bill(file: UploadFile = File(...)):
         response = client.models.generate_content(
             model="gemini-2.5-flash",
             contents=[
-                "This is a bill/receipt image. Extract all necessary and useful information that could be needed to answer any question the user has.",
+                "This is a bill/receipt image. Extract all necessary and useful information that could be needed to answer any question the user has as well as errors, next steps, and other information the user could use.",
                 types.Part.from_bytes(
                     data=file_bytes,
                     mime_type=file.content_type,

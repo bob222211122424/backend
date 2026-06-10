@@ -4,7 +4,7 @@ from google.genai import types
 import os
 
 app = FastAPI()
-client = genai.Client(api_key="os.getenv("API_key")")
+client = genai.Client(api_key=os.getenv("API_key"))
 current_receipt_text = None
 
 @app.get("/chat")

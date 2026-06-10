@@ -1,5 +1,6 @@
 from fastapi import FastAPI, UploadFile, File
 from google import genai
+from google.genai import types
 import os
 
 app = FastAPI()
@@ -21,6 +22,7 @@ def chat(prompt: str):
 
 @app.post("/analyze_bill")
 async def analyze_bill(file: UploadFile = File(...)):
+    global current_receipt_text
     try:
         file_bytes = await file.read()
 

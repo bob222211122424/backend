@@ -3,7 +3,6 @@ from google import genai
 import os
 
 app = FastAPI()
-api_key = os.getenv("API_key")
 client = genai.Client(api_key="API_key")
 current_receipt_text = None
 

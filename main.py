@@ -1,12 +1,22 @@
 from fastapi import FastAPI, UploadFile, File
 from google import genai
 from google.genai import types
+from fastapi.middleware.cors import CORSMiddleware
 import os
 
 app = FastAPI()
 client = genai.Client(api_key=os.getenv("API_key"))
 current_receipt_text = None
-
+origins = [
+    "https://frontend-exyb.onrender.com",
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all HTTP methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allows all headers
+)
 @app.get("/chat")
 def chat(prompt: str):
     try:

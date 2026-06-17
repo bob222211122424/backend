@@ -6,17 +6,23 @@ import os
 
 app = FastAPI()
 client = genai.Client(api_key=os.getenv("API_key"))
+
 current_receipt_text = None
+conversation_history = []
+
 origins = [
     "https://frontend-exyb.onrender.com",
 ]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+
+
 @app.get("/chat")
 def chat(prompt: str):
     try:
@@ -33,6 +39,10 @@ def chat(prompt: str):
 @app.post("/analyze_bill")
 async def analyze_bill(file: UploadFile = File(...)):
     global current_receipt_text
+    global conversation_history
+
+    conversation_history = []
+
     try:
         file_bytes = await file.read()
 
@@ -58,16 +68,26 @@ async def analyze_bill(file: UploadFile = File(...)):
 @app.get("/ask")
 def ask(question: str):
     global current_receipt_text
+    global conversation_history
 
     if current_receipt_text is None:
         return {
             "error": "You have not uploaded an image yet or I have not received it."
         }
 
+    history_text = ""
+
+    for message in conversation_history:
+        history_text += f"{message['role']}: {message['text']}\n"
+
     prompt = f"""
 Receipt information:
 
 {current_receipt_text}
+
+Conversation History:
+
+{history_text}
 
 Question about receipt:
 
@@ -78,6 +98,16 @@ Question about receipt:
         model="gemini-2.5-flash",
         contents=prompt
     )
+
+    conversation_history.append({
+        "role": "user",
+        "text": question
+    })
+
+    conversation_history.append({
+        "role": "assistant",
+        "text": response.text
+    })
 
     return {
         "answer": response.text
